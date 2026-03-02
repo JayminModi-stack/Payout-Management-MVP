@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import API from "../api";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 function PayoutList() {
@@ -11,42 +11,42 @@ function PayoutList() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const { logout, role } = useContext(AuthContext);
-  const navigate = useNavigate();
+  const { role } = useContext(AuthContext);
 
-  const fetchVendors = async () => {
-    try {
-      const res = await API.get("/vendors");
-      setVendors(res.data || []);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load vendors");
-      setVendors([]);
-    }
-  };
-
-  const fetchPayouts = async () => {
-    try {
-      setLoading(true);
-      setError("");
-
-      const res = await API.get(`/payouts?status=${status}&vendor=${vendor}`);
-      console.log("Payouts API response:", res.data);
-      setPayouts(res.data || []);
-    } catch (err) {
-      console.error(err);
-      setError("Error fetching payouts");
-      setPayouts([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Fetch vendors once on component mount
   useEffect(() => {
+    const fetchVendors = async () => {
+      try {
+        const res = await API.get("/vendors");
+        setVendors(res.data || []);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load vendors");
+        setVendors([]);
+      }
+    };
+
     fetchVendors();
   }, []);
 
+  // Fetch payouts whenever status or vendor changes
   useEffect(() => {
+    const fetchPayouts = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const res = await API.get(`/payouts?status=${status}&vendor=${vendor}`);
+        console.log("Payouts API response:", res.data);
+        setPayouts(res.data || []);
+      } catch (err) {
+        console.error(err);
+        setError("Error fetching payouts");
+        setPayouts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchPayouts();
   }, [status, vendor]);
 
@@ -119,14 +119,15 @@ function PayoutList() {
                   <td>₹ {p.amount}</td>
                   <td>
                     <span
-                      className={`badge ${p.status === "Approved"
+                      className={`badge ${
+                        p.status === "Approved"
                           ? "bg-success"
                           : p.status === "Rejected"
-                            ? "bg-danger"
-                            : p.status === "Submitted"
-                              ? "bg-warning text-dark"
-                              : "bg-secondary"
-                        }`}
+                          ? "bg-danger"
+                          : p.status === "Submitted"
+                          ? "bg-warning text-dark"
+                          : "bg-secondary"
+                      }`}
                     >
                       {p.status}
                     </span>

@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useCallback } from "react";
 import API from "../api";
 import { AuthContext } from "../context/AuthContext";
 
@@ -8,31 +8,56 @@ function PayoutDetail() {
   const { role } = useContext(AuthContext);
   const [data, setData] = useState(null);
 
-  const fetchData = async () => {
-    const res = await API.get(`/payouts/${id}`);
-    setData(res.data);
-  };
+  // useCallback ensures fetchData has stable reference
+  const fetchData = useCallback(async () => {
+    try {
+      const res = await API.get(`/payouts/${id}`);
+      setData(res.data);
+    } catch (err) {
+      console.error("Error fetching payout:", err);
+    }
+  }, [id]);
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const submit = async () => {
-    await API.post(`/payouts/${id}/submit`);
-    fetchData();
+    try {
+      await API.post(`/payouts/${id}/submit`);
+      fetchData();
+    } catch (err) {
+      console.error("Error submitting payout:", err);
+    }
   };
 
   const approve = async () => {
-    await API.post(`/payouts/${id}/approve`);
-    fetchData();
+    try {
+      await API.post(`/payouts/${id}/approve`);
+      fetchData();
+    } catch (err) {
+      console.error("Error approving payout:", err);
+    }
   };
 
   const reject = async () => {
     const reason = prompt("Enter reason");
     if (!reason) return;
-    await API.post(`/payouts/${id}/reject`, { reason });
-    fetchData();
+    try {
+      await API.post(`/payouts/${id}/reject`, { reason });
+      fetchData();
+    } catch (err) {
+      console.error("Error rejecting payout:", err);
+    }
   };
 
-  if (!data) return <div className="text-center mt-5"><div className="spinner-border"></div></div>;
+  if (!data) {
+    return (
+      <div className="text-center mt-5">
+        <div className="spinner-border"></div>
+      </div>
+    );
+  }
 
   const { payout, audits } = data;
 
@@ -43,13 +68,13 @@ function PayoutDetail() {
         <p><strong>Status:</strong> {payout.status}</p>
         <p><strong>Amount:</strong> ₹ {payout.amount}</p>
 
-        {role === "OPS" && payout.status === "Draft" &&
+        {role === "OPS" && payout.status === "Draft" && (
           <button className="btn btn-primary me-2" onClick={submit}>
             Submit
           </button>
-        }
+        )}
 
-        {role === "FINANCE" && payout.status === "Submitted" &&
+        {role === "FINANCE" && payout.status === "Submitted" && (
           <>
             <button className="btn btn-success me-2" onClick={approve}>
               Approve
@@ -58,12 +83,12 @@ function PayoutDetail() {
               Reject
             </button>
           </>
-        }
+        )}
       </div>
 
       <div className="card shadow p-4">
         <h5>Audit Trail</h5>
-        {audits.map(a => (
+        {audits.map((a) => (
           <div key={a.id}>
             {a.action} by User {a.performed_by}
           </div>
