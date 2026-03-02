@@ -12,10 +12,10 @@ async function seed() {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("✅ MongoDB Connected");
 
-    // await User.deleteMany();
-    // await Vendor.deleteMany();
-    // await Payout.deleteMany();
-    // await Audit.deleteMany();
+    await User.deleteMany();
+    await Vendor.deleteMany();
+    await Payout.deleteMany();
+    await Audit.deleteMany();
 
     const opsPass = await bcrypt.hash("ops123", 10);
     const finPass = await bcrypt.hash("fin123", 10);
