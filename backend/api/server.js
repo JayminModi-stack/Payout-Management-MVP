@@ -27,4 +27,4 @@ app.use("/api/vendors", require("../routes/vendor"));
 app.use("/api/payouts", require("../routes/payout"));
 
 
-module.export = app;
+module.exports = app;
