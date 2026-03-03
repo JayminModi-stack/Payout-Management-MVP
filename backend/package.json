@@ -7,10 +7,6 @@
   "dev": "nodemon api/server.js",
   "seed": "node seed.js"
 },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
