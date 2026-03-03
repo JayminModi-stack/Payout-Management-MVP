@@ -14,9 +14,13 @@ app.use(cors({
 }));
 app.use(express.json());
 
-app.get("/", (req, res) => {
-    res.send("Welcome to the Payout API");
-})
+app.get("/", (request, response) => {
+  response.send({
+    name: "Payout-Management-MVP-API",
+    date: new Date(),
+    test: "1",
+  });
+});
 
 app.use("/api/auth", require("../routes/auth"));
 app.use("/api/vendors", require("../routes/vendor"));
