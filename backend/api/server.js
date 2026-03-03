@@ -7,24 +7,18 @@ const app = express();
 
 connectDB();
 
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(cors());
 app.use(express.json());
 
-app.get("/", (request, response) => {
-  response.send({
+app.get("/", (req, res) => {
+  res.json({
     name: "Payout-Management-MVP-API",
     date: new Date(),
-    test: "1",
   });
 });
 
 app.use("/api/auth", require("../routes/auth"));
 app.use("/api/vendors", require("../routes/vendor"));
 app.use("/api/payouts", require("../routes/payout"));
-
 
 module.exports = app;
